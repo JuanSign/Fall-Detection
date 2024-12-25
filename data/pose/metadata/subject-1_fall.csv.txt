@@ -1,4 +1,5 @@
-Jumlah missing values pada setiap atribut:id                      0
+Jumlah missing values pada setiap atribut:
+id                      0
 path                    0
 label                   0
 NOSE_X                  6

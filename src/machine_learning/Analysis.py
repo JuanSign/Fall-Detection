@@ -12,5 +12,5 @@ for file_name in os.listdir(root):
         folder = os.path.join(root, "metadata")
         with open (os.path.join(folder, file_name+".txt"), "w") as file:
             # Tampilkan hasil
-            file.write("Jumlah missing values pada setiap atribut:")
+            file.write("Jumlah missing values pada setiap atribut:\n")
             file.write(missing_values.to_string())
