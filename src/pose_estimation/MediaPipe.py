@@ -7,7 +7,7 @@ class MediaPipe_Pipeline:
         self.mp_drawing = mp_drawing
     
     @staticmethod
-    def process_image(path):
+    def process_image(path, output):
         image = cv2.imread(path)
         
         image_height, image_width, _ = image.shape
@@ -15,7 +15,9 @@ class MediaPipe_Pipeline:
         rgb_img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         
         results = pose.process(rgb_img)        
-        
+
+        resultMap = {}
+
         if results.pose_landmarks:
             mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
 
@@ -26,12 +28,20 @@ class MediaPipe_Pipeline:
                 y = int(landmark.y * image_height) 
                 
                 confidence = landmark.visibility
-                
-                print(f"{landmark_name}: ({x}, {y}), Confidence: {confidence:.2f}")
 
-        cv2.imshow("Pose Estimation", image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+                if confidence >= 88:
+                    resultMap[landmark_name + '_X'] = x
+                    resultMap[landmark_name + '_Y'] = y 
+
+                if output:
+                    print(f"{landmark_name}: ({x}, {y}), Confidence: {confidence:.2f}")
+
+        if output:
+            cv2.imshow("Pose Estimation", image)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+        
+        return resultMap
 
 # Initialize MediaPipe Pose and Drawing modules
 mp_pose = mp.solutions.pose
@@ -40,4 +50,4 @@ pose = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
 # Example usage:
 pipeline = MediaPipe_Pipeline(pose, mp_drawing)
-pipeline.process_image(r'path_to_image.jpg')
+pipeline.process_image(r'path_to_image')
