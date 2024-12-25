@@ -6,6 +6,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import classification_report
 from sklearn.impute import SimpleImputer
+from sklearn.impute import KNNImputer
+
 
 # Daftar fitur yang ingin digunakan
 features = [
@@ -34,7 +36,9 @@ y = combined_data['label']  # Pastikan kolom target ada di dataset Anda
 combined_data = combined_data[features]
 
 # Menangani missing values menggunakan SimpleImputer
-imputer = SimpleImputer(strategy='mean')  # Menggunakan rata-rata untuk menggantikan missing values
+imputer = KNNImputer(n_neighbors=5, keep_empty_features=True)
+
+# imputer = SimpleImputer(strategy='mean')  # Menggunakan rata-rata untuk menggantikan missing values
 combined_data_imputed = pd.DataFrame(imputer.fit_transform(combined_data), columns=combined_data.columns)
 
 # Membagi data menjadi fitur (X) dan target (y)
