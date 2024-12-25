@@ -81,7 +81,8 @@ for s in range(4):
                             id+=1
                             img_data.append(id)
                             img_data.append(img_path)
-                            img_data.append(f)
+                            label = 1 if f == 0 else 0
+                            img_data.append(label)
                             for idx_col in range (3, len(columns)):
                                 if columns[idx_col] in result and result[columns[idx_col]] is not None:
                                     img_data.append(result[columns[idx_col]])
