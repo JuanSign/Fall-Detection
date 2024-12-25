@@ -1,0 +1,5 @@
+# store data ONLY in local copies / cloud
+test/
+train/
+sample_submission.csv
+
