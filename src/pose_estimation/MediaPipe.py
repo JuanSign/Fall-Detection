@@ -7,7 +7,7 @@ class MediaPipe_Pipeline:
         self.mp_drawing = mp_drawing
     
     @staticmethod
-    def process_image(path, output):
+    def process_image(path, output=False):
         image = cv2.imread(path)
         
         image_height, image_width, _ = image.shape
@@ -29,7 +29,7 @@ class MediaPipe_Pipeline:
                 
                 confidence = landmark.visibility
 
-                if confidence >= 88:
+                if confidence >= 0.88:
                     resultMap[landmark_name + '_X'] = x
                     resultMap[landmark_name + '_Y'] = y 
 
@@ -48,6 +48,7 @@ mp_pose = mp.solutions.pose
 mp_drawing = mp.solutions.drawing_utils
 pose = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
-# Example usage:
-pipeline = MediaPipe_Pipeline(pose, mp_drawing)
-pipeline.process_image(r'path_to_image')
+# # Example usage:
+# pipeline = MediaPipe_Pipeline(pose, mp_drawing)
+# result = pipeline.process_image(r'data\dataset\train\subject-1\fall\1_backward_falls\frame001.jpg', False)
+# print(result)

@@ -1,8 +1,12 @@
 import pandas as pd
+from ..pose_estimation.MediaPipe import MediaPipe_Pipeline, mp
 import os
+import cv2
+import csv
 
-data = pd.DataFrame(columns=[
+columns = [
     'id',
+    'path',
     'label',
     'NOSE_X' , 'NOSE_Y' ,
     'LEFT_EYE_INNER_X' , 'LEFT_EYE_INNER_Y' ,
@@ -37,17 +41,51 @@ data = pd.DataFrame(columns=[
     'RIGHT_HEEL_X' , 'RIGHT_HEEL_Y' ,
     'LEFT_FOOT_INDEX_X' , 'LEFT_FOOT_INDEX_Y' ,
     'RIGHT_FOOT_INDEX_X' , 'RIGHT_FOOT_INDEX_Y'
-])
+]
+header = [columns]
+data = pd.DataFrame(columns)
 
-root = r'data/train'
+root = r'data/dataset/train'
 subject = ['subject-1', 'subject-2', 'subject-3', 'subject-4']
-fallType = ['_backward_falls', '_forward_falls', '_left_falls', '_right_falls', '_sitting_falls', '_standing_fall']
+fallType = ['_backward_falls', '_forward_falls', '_left_falls', '_right_falls', '_sitting_falls', '_standing_falls']
 nonFallType = ['_jumping', '_laying', '_picking', '_squat', '_stretching', '_walking']
+
+# Initialize MediaPipe Pose and Drawing modules
+mp_pose = mp.solutions.pose
+mp_drawing = mp.solutions.drawing_utils
+pose = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
+
+# Example usage:
+pipeline = MediaPipe_Pipeline(pose, mp_drawing)
 
 for s in range(4):
     for f in range(2):
-        for t in range(6):
-            if f == 0:
-                path = root + '/' + subject[s] + '/' + 'fall/' + subject[s][-1] + fallType[t]
-            if f == 1:
-                path = root + '/' + subject[s] + '/' + 'non_fall/' + subject[s][-1] + nonFallType[t]
+        with open(f"{subject[s]}_{'fall' if f == 0 else 'non_fall'}.csv", mode="w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerows(header)
+            id = 0
+            for t in range(6):
+                if f == 0:
+                    path = root + '/' + subject[s] + '/' + 'fall/' + subject[s][-1] + fallType[t]
+                if f == 1:
+                    path = root + '/' + subject[s] + '/' + 'non_fall/' + subject[s][-1] + nonFallType[t]
+
+                for img_name in os.listdir(path):
+                    data = []
+                    if img_name.endswith(('.jpg', '.png', '.jpeg')):
+                        img_path = os.path.join(path, img_name)
+                        # img = cv2.imread(img_path)
+                        result = pipeline.process_image(img_path, False)
+                        img_data = []
+                        if result is not None:
+                            id+=1
+                            img_data.append(id)
+                            img_data.append(img_path)
+                            img_data.append(f)
+                            for idx_col in range (3, len(columns)):
+                                if columns[idx_col] in result and result[columns[idx_col]] is not None:
+                                    img_data.append(result[columns[idx_col]])
+                                else:
+                                    img_data.append(None)
+                        data.append(img_data)
+                    writer.writerows(data)
