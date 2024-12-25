@@ -3,3 +3,5 @@ test/
 train/
 sample_submission.csv
 
+# virtual environment for python 3.10
+venv310/
